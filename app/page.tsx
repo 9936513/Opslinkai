@@ -1,5 +1,5 @@
-import Header from '../components/Header'
-import ExtractorWidget from '../components/ExtractorWidget'
+import { Header } from '../components/Header'
+import { ExtractorWidget } from '../components/ExtractorWidget'
 
 export default function Home() {
   return (

@@ -2,137 +2,97 @@
 
 import { useState } from 'react'
 
-interface ExtractionResult {
-  url: string
-  type: string
-  timestamp: string
-  status: string
-  data: {
-    title: string
-    content: string
-    metadata: {
-      source: string
-      extractedAt: string
-      confidence: number
+export function ExtractorWidget() {
+  const [dragActive, setDragActive] = useState(false)
+  
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
     }
   }
-}
 
-export default function ExtractorWidget() {
-  const [url, setUrl] = useState('')
-  const [extractionType, setExtractionType] = useState('text')
-  const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<ExtractionResult | null>(null)
-  const [error, setError] = useState('')
-
-  const handleExtract = async (e: React.FormEvent) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    setError('')
-    setResult(null)
+    e.stopPropagation()
+    setDragActive(false)
+    
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length > 0) {
+      console.log('Files dropped:', files)
+    }
+  }
 
-    try {
-      const response = await fetch('/api/extract', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url,
-          type: extractionType,
-          options: {}
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to extract data')
-      }
-
-      const data = await response.json()
-      setResult(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
-      setIsLoading(false)
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length > 0) {
+      console.log('Files selected:', files)
     }
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-        Data Extractor
-      </h2>
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-100">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          Try Opslinkai Now
+        </h2>
+        <p className="text-gray-600">
+          Upload a document, photo, or screenshot to see the AI extraction in action
+        </p>
+      </div>
       
-      <form onSubmit={handleExtract} className="space-y-4">
-        <div>
-          <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
-            Source URL
+      <div
+        className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
+          dragActive 
+            ? 'border-blue-400 bg-blue-50' 
+            : 'border-gray-300 bg-white'
+        }`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <div className="text-6xl mb-4">📄</div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          {dragActive ? 'Drop your files here' : 'Drag & drop files here'}
+        </h3>
+        <p className="text-gray-500 mb-4">
+          Supports PDFs, images, screenshots, and documents
+        </p>
+        
+        <div className="flex items-center justify-center">
+          <label className="btn-primary cursor-pointer">
+            <input
+              type="file"
+              className="hidden"
+              onChange={handleFileInput}
+              accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx"
+              multiple
+            />
+            Choose Files
           </label>
-          <input
-            type="url"
-            id="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            required
-          />
         </div>
-
-        <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
-            Extraction Type
-          </label>
-          <select
-            id="type"
-            value={extractionType}
-            onChange={(e) => setExtractionType(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="text">Text Content</option>
-            <option value="metadata">Metadata</option>
-            <option value="links">Links</option>
-            <option value="images">Images</option>
-          </select>
+        
+        <div className="mt-6 grid grid-cols-3 gap-4 text-xs text-gray-400">
+          <div className="flex items-center justify-center">📄 PDFs</div>
+          <div className="flex items-center justify-center">📷 Images</div>
+          <div className="flex items-center justify-center">📝 Documents</div>
         </div>
+      </div>
 
-        <button
-          type="submit"
-          disabled={isLoading || !url}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-        >
-          {isLoading ? 'Extracting...' : 'Extract Data'}
-        </button>
-      </form>
-
-      {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-600">{error}</p>
+      <div className="mt-8 p-6 bg-white rounded-lg border border-gray-200">
+        <h4 className="font-medium text-gray-900 mb-3">Sample Extraction Result:</h4>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div><span className="font-medium text-gray-600">Name:</span> <span className="ml-2">John Smith</span></div>
+          <div><span className="font-medium text-gray-600">Email:</span> <span className="ml-2">john@example.com</span></div>
+          <div><span className="font-medium text-gray-600">Phone:</span> <span className="ml-2">(555) 123-4567</span></div>
+          <div><span className="font-medium text-gray-600">Company:</span> <span className="ml-2">Smith Real Estate</span></div>
         </div>
-      )}
-
-      {result && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-          <h3 className="text-lg font-semibold text-green-800 mb-2">
-            Extraction Successful
-          </h3>
-          <div className="space-y-2 text-sm">
-            <p><strong>URL:</strong> {result.url}</p>
-            <p><strong>Type:</strong> {result.type}</p>
-            <p><strong>Status:</strong> {result.status}</p>
-            <p><strong>Title:</strong> {result.data.title}</p>
-            <p><strong>Confidence:</strong> {(result.data.metadata.confidence * 100).toFixed(1)}%</p>
-            <details className="mt-2">
-              <summary className="cursor-pointer text-green-700 font-medium">
-                View Full Data
-              </summary>
-              <pre className="mt-2 p-2 bg-white rounded text-xs overflow-auto">
-                {JSON.stringify(result, null, 2)}
-              </pre>
-            </details>
-          </div>
-        </div>
-      )}
+        <div className="mt-3 text-xs text-green-600">✓ 95% Confidence Score</div>
+      </div>
     </div>
   )
 }
