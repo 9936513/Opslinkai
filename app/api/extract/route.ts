@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { processWithDualAI } from '../../../lib/ai-processing'
+import { DocumentProcessor, PROCESSING_TIERS } from '../../../lib/tiered-processing'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,8 +39,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Process with dual AI
-    const result = await processWithDualAI(file)
+    // Get user plan from request (default to professional for demo)
+    const userPlan = formData.get('plan') as string || 'professional'
+    
+    // Process with tiered system
+    const processor = new DocumentProcessor()
+    const result = await processor.process(file, userPlan)
     
     // Return comprehensive result
     const response = {
@@ -52,29 +56,19 @@ export async function POST(request: NextRequest) {
         type: file.type
       },
       processing: {
-        gpt4: {
-          success: result.gpt4Result.success,
-          confidence: result.gpt4Result.confidence,
-          processingTime: result.gpt4Result.processingTime,
-          error: result.gpt4Result.error
-        },
-        claude: {
-          success: result.claudeResult.success,
-          confidence: result.claudeResult.confidence,
-          processingTime: result.claudeResult.processingTime,
-          error: result.claudeResult.error
-        },
-        consensus: {
-          score: result.consensusScore,
-          confidence: result.confidence,
-          totalTime: result.processingTime
-        }
+        model: result.model,
+        tier: result.tier,
+        confidence: result.confidence,
+        processingTime: result.processingTime,
+        accuracy: result.accuracy,
+        error: result.error
       },
-      data: result.finalResult,
+      data: result.data,
       metadata: {
-        models: ['gpt-4-vision', 'claude-3-sonnet'],
-        version: '1.0.0',
-        requiresReview: result.confidence === 'low'
+        model: result.model,
+        tier: result.tier,
+        version: '2.0.0',
+        requiresReview: result.confidence < 0.8
       }
     }
     

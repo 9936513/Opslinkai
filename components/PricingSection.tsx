@@ -15,93 +15,70 @@ import {
 const plans = [
   {
     name: "Starter",
-    price: "$29",
+    price: "$49",
     period: "/month",
-    description: "Perfect for individual agents getting started",
+    description: "GPT-4V processing for individual agents",
     icon: Zap,
     color: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-50",
     borderColor: "border-blue-200",
     popular: false,
     features: [
-      "100 AI extractions/month",
-      "Basic CRM integration",
+      "GPT-4V processing only",
+      "500 documents/month",
+      "85% accuracy guarantee",
       "Email support",
-      "Standard processing speed",
-      "PDF & image support",
-      "Basic analytics"
+      "Basic analytics",
+      "PDF & image support"
     ],
     cta: "Start Free Trial",
     ctaStyle: "bg-blue-600 hover:bg-blue-700"
   },
   {
-    name: "Pro",
-    price: "$79",
+    name: "Professional",
+    price: "$149",
     period: "/month",
-    description: "For power users and small teams",
+    description: "Smart AI routing for power users",
     icon: Star,
     color: "from-orange-500 to-orange-600",
     bgColor: "bg-orange-50",
     borderColor: "border-orange-200",
     popular: true,
     features: [
-      "Unlimited AI extractions",
-      "Advanced CRM integration",
+      "Smart AI routing (Claude + GPT-4V)",
+      "2,000 documents/month",
+      "92% accuracy guarantee",
+      "Automatic fallback",
       "Priority support",
-      "API access",
-      "All file formats",
       "Advanced analytics",
-      "Custom workflows",
+      "API access",
       "Team collaboration"
     ],
     cta: "Start Free Trial",
     ctaStyle: "bg-orange-600 hover:bg-orange-700"
   },
   {
-    name: "Enterprise",
-    price: "$199",
+    name: "Business",
+    price: "$399",
     period: "/month",
-    description: "For brokerages and large teams",
+    description: "Ensemble validation for enterprises",
     icon: Shield,
     color: "from-green-500 to-green-600",
     bgColor: "bg-green-50",
     borderColor: "border-green-200",
     popular: false,
     features: [
-      "Unlimited extractions",
-      "Multi-user management",
+      "Ensemble validation (both AIs)",
+      "8,000 documents/month",
+      "98% accuracy guarantee",
+      "Human review queue",
+      "Dedicated support",
       "Custom integrations",
-      "Phone support",
       "White-label options",
-      "Advanced security",
-      "Dedicated account manager",
-      "Custom training"
-    ],
-    cta: "Contact Sales",
-    ctaStyle: "bg-green-600 hover:bg-green-700"
-  },
-  {
-    name: "Custom",
-    price: "Contact",
-    period: "Sales",
-    description: "Tailored solutions for enterprise clients",
-    icon: Crown,
-    color: "from-purple-500 to-purple-600",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
-    popular: false,
-    features: [
-      "Unlimited everything",
-      "On-premises deployment",
-      "Custom AI models",
-      "24/7 dedicated support",
-      "Full white-label",
-      "Enterprise security",
-      "Custom compliance",
       "SLA guarantees"
     ],
     cta: "Contact Sales",
-    ctaStyle: "bg-purple-600 hover:bg-purple-700"
+    ctaStyle: "bg-green-600 hover:bg-green-700"
   }
 ]
 
