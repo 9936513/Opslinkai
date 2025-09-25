@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'OpsLinkAI',
-  description: 'AI-powered operations linking platform',
+  title: 'OpsLinkAI - Enterprise-Grade AI Data Extraction',
+  description: 'Transform any document, image, or email into structured data with 99.9% accuracy. Built for medium to large businesses and law firms.',
 }
 
 export default function RootLayout({
