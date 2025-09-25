@@ -6,46 +6,106 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Enterprise utility functions
-export const formatFileSize = (bytes: number): string => {
+// File utility functions
+export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 Bytes'
+  
   const k = 1024
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-export const formatConfidenceScore = (score: number): string => {
-  return `${(score * 100).toFixed(1)}%`
+// Confidence scoring utilities
+export function formatConfidenceScore(score: number): string {
+  return `${Math.round(score * 100)}%`
 }
 
-export const getConfidenceColor = (score: number): string => {
-  if (score >= 0.9) return 'text-success-600'
-  if (score >= 0.7) return 'text-warning-600'
+export function getConfidenceColor(score: number): string {
+  if (score >= 0.8) return 'text-success-600'
+  if (score >= 0.6) return 'text-warning-600'
   return 'text-error-600'
 }
 
-export const formatProcessingTime = (seconds: number): string => {
-  if (seconds < 1) return `${(seconds * 1000).toFixed(0)}ms`
-  return `${seconds.toFixed(1)}s`
+export function getConfidenceLevel(score: number): 'high' | 'medium' | 'low' {
+  if (score >= 0.8) return 'high'
+  if (score >= 0.6) return 'medium'
+  return 'low'
 }
 
-// Enterprise validation functions
-export const validateFileType = (file: File, allowedTypes: string[]): boolean => {
+// Processing status utilities
+export function getProcessingStatusColor(status: string): string {
+  switch (status) {
+    case 'gpt4':
+      return 'bg-primary-100 text-primary-800 border-primary-200'
+    case 'claude':
+      return 'bg-accent-100 text-accent-800 border-accent-200'
+    case 'consensus':
+      return 'bg-success-100 text-success-800 border-success-200'
+    case 'complete':
+      return 'bg-success-100 text-success-800 border-success-200'
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+}
+
+// Animation utilities
+export function getAnimationDelay(index: number): number {
+  return index * 0.1
+}
+
+// Validation utilities
+export function validateFileType(file: File): boolean {
+  const allowedTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ]
   return allowedTypes.includes(file.type)
 }
 
-export const validateFileSize = (file: File, maxSizeMB: number): boolean => {
-  const maxSizeBytes = maxSizeMB * 1024 * 1024
-  return file.size <= maxSizeBytes
+export function validateFileSize(file: File, maxSizeMB: number = 10): boolean {
+  const maxSize = maxSizeMB * 1024 * 1024 // Convert MB to bytes
+  return file.size <= maxSize
 }
 
-// Industry-specific document types
-export const documentTypes = {
-  legal: ['application/pdf', 'image/jpeg', 'image/png'],
-  realEstate: ['application/pdf', 'image/jpeg', 'image/png', 'application/msword'],
-  business: ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'text/plain'],
-  general: ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'text/plain'],
-} as const
+// Error handling utilities
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  return 'An unexpected error occurred'
+}
 
-export type DocumentType = keyof typeof documentTypes
+// Performance utilities
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
+
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean
+  return (...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args)
+      inThrottle = true
+      setTimeout(() => (inThrottle = false), limit)
+    }
+  }
+}
