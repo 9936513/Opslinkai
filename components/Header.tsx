@@ -1,16 +1,140 @@
+'use client'
+
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Menu, X, Shield, Zap, Users } from 'lucide-react'
+import { cn } from '../lib/utils'
+
 export function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-primary-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-6">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600">Opslinkai</h1>
+        <div className="flex justify-between items-center py-4">
+          {/* Logo Section */}
+          <motion.div 
+            className="flex items-center space-x-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-lg flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                OpsLinkAI
+              </h1>
+              <p className="text-xs text-primary-500 font-medium">Enterprise Grade</p>
+            </div>
+          </motion.div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <motion.a
+              href="#features"
+              className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Zap className="w-4 h-4" />
+              <span>Features</span>
+            </motion.a>
+            <motion.a
+              href="#pricing"
+              className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Pricing
+            </motion.a>
+            <motion.a
+              href="#enterprise"
+              className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Users className="w-4 h-4" />
+              <span>Enterprise</span>
+            </motion.a>
+          </nav>
+
+          {/* Desktop CTA Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
+            <motion.button
+              className="px-6 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Sign In
+            </motion.button>
+            <motion.button
+              className="px-6 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Start Free Trial
+            </motion.button>
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="btn-secondary">Sign In</button>
-            <button className="btn-primary">Get Started</button>
-          </div>
+
+          {/* Mobile Menu Button */}
+          <motion.button
+            className="md:hidden p-2 text-primary-700 hover:text-primary-600 transition-colors duration-200"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            whileTap={{ scale: 0.95 }}
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </motion.button>
         </div>
+
+        {/* Mobile Navigation */}
+        <motion.div
+          className={cn(
+            "md:hidden overflow-hidden transition-all duration-300 ease-in-out",
+            isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          )}
+          initial={false}
+          animate={{ height: isMenuOpen ? "auto" : 0 }}
+        >
+          <div className="py-4 space-y-4 border-t border-primary-200">
+            <a
+              href="#features"
+              className="block px-4 py-2 text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Features
+            </a>
+            <a
+              href="#pricing"
+              className="block px-4 py-2 text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Pricing
+            </a>
+            <a
+              href="#enterprise"
+              className="block px-4 py-2 text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Enterprise
+            </a>
+            <div className="px-4 pt-4 space-y-3">
+              <button
+                className="w-full px-4 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sign In
+              </button>
+              <button
+                className="w-full px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Start Free Trial
+              </button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </header>
   )
