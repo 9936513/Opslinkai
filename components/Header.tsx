@@ -30,35 +30,35 @@ export function Header() {
             </div>
           </motion.div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <motion.a
-              href="#features"
-              className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Zap className="w-4 h-4" />
-              <span>Features</span>
-            </motion.a>
-            <motion.a
-              href="#pricing"
-              className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Pricing
-            </motion.a>
-            <motion.a
-              href="#enterprise"
-              className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Users className="w-4 h-4" />
-              <span>Enterprise</span>
-            </motion.a>
-          </nav>
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex items-center space-x-8">
+                <motion.a
+                  href="#features"
+                  className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>Features</span>
+                </motion.a>
+                <motion.a
+                  href="#pricing"
+                  className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Pricing
+                </motion.a>
+                <motion.a
+                  href="/dashboard"
+                  className="text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200 flex items-center space-x-1"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Users className="w-4 h-4" />
+                  <span>Dashboard</span>
+                </motion.a>
+              </nav>
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
@@ -112,13 +112,13 @@ export function Header() {
             >
               Pricing
             </a>
-            <a
-              href="#enterprise"
-              className="block px-4 py-2 text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Enterprise
-            </a>
+                <a
+                  href="/dashboard"
+                  className="block px-4 py-2 text-primary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </a>
             <div className="px-4 pt-4 space-y-3">
               <button
                 className="w-full px-4 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
