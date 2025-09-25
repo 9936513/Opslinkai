@@ -1,50 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { DocumentProcessor, PROCESSING_TIERS } from '../../../lib/tiered-processing'
+import { checkUsageLimit } from '../../../lib/usage-tracking'
+import { AuthService } from '../../../lib/auth'
+import { ErrorHandler, validateFile, validatePlan, PerformanceMonitor } from '../../../lib/error-handling'
 
 export async function POST(request: NextRequest) {
+  const endTimer = PerformanceMonitor.startTimer('document_extraction')
+  
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File
     
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
+      const error = ErrorHandler.createError('MISSING_REQUIRED_FIELD', 'No file provided')
+      const { statusCode, response } = ErrorHandler.handleAPIError(error, {
+        endpoint: '/api/extract',
+        method: 'POST'
+      })
+      return NextResponse.json(response, { status: statusCode })
     }
 
-    // Validate file type
-    const allowedTypes = [
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ]
-    
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Unsupported file type' },
-        { status: 400 }
-      )
+    // Validate file
+    try {
+      validateFile(file)
+    } catch (validationError) {
+      const { statusCode, response } = ErrorHandler.handleAPIError(validationError, {
+        endpoint: '/api/extract',
+        method: 'POST'
+      })
+      return NextResponse.json(response, { status: statusCode })
     }
 
-    // Validate file size (10MB limit)
-    const maxSize = 10 * 1024 * 1024 // 10MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 10MB' },
-        { status: 400 }
-      )
-    }
-
-    // Get user plan from request (default to professional for demo)
+    // Get user authentication and plan
+    const authToken = request.headers.get('authorization')?.replace('Bearer ', '')
     const userPlan = formData.get('plan') as string || 'professional'
     
+    // Validate plan
+    try {
+      validatePlan(userPlan)
+    } catch (validationError) {
+      const { statusCode, response } = ErrorHandler.handleAPIError(validationError, {
+        endpoint: '/api/extract',
+        method: 'POST'
+      })
+      return NextResponse.json(response, { status: statusCode })
+    }
+    
+    // Check authentication (for demo, allow without auth)
+    let userId = '1' // Default demo user
+    if (authToken) {
+      const user = await AuthService.getCurrentUser(authToken)
+      if (user) {
+        userId = user.id
+      }
+    }
+    
+    // Check usage limits
+    const usageCheck = await checkUsageLimit(userId)
+    if (!usageCheck.allowed) {
+      const error = ErrorHandler.createError('USAGE_LIMIT_EXCEEDED', usageCheck.reason || 'Usage limit exceeded')
+      const { statusCode, response } = ErrorHandler.handleAPIError(error, {
+        endpoint: '/api/extract',
+        method: 'POST'
+      })
+      return NextResponse.json({
+        ...response,
+        remainingUsage: usageCheck.remainingUsage,
+        resetDate: usageCheck.resetDate
+      }, { status: statusCode })
+    }
+        
     // Process with tiered system
     const processor = new DocumentProcessor()
     const result = await processor.process(file, userPlan)
+    
+    // Record usage (in production, this would be async)
+    // await UsageTracker.recordProcessing(userId)
+    
+    // End performance timer
+    endTimer()
     
     // Return comprehensive result
     const response = {
@@ -69,19 +103,25 @@ export async function POST(request: NextRequest) {
         tier: result.tier,
         version: '2.0.0',
         requiresReview: result.confidence < 0.8
+      },
+      usage: {
+        remainingUsage: usageCheck.remainingUsage,
+        resetDate: usageCheck.resetDate
       }
     }
     
     return NextResponse.json(response)
   } catch (error) {
-    console.error('Dual AI extraction error:', error)
-    return NextResponse.json(
-      { 
-        error: 'Failed to extract data',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    )
+    // End performance timer on error
+    endTimer()
+    
+    const { statusCode, response } = ErrorHandler.handleAPIError(error, {
+      endpoint: '/api/extract',
+      method: 'POST',
+      userAgent: request.headers.get('user-agent') || undefined
+    })
+    
+    return NextResponse.json(response, { status: statusCode })
   }
 }
 

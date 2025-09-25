@@ -1,5 +1,6 @@
 import { Header } from '../../components/Header'
 import { AnalyticsDashboard } from '../../components/AnalyticsDashboard'
+import { UsageDashboard } from '../../components/UsageDashboard'
 
 export default function Dashboard() {
   return (
@@ -12,6 +13,12 @@ export default function Dashboard() {
           <p className="text-gray-600">Monitor your AI processing performance and analytics</p>
         </div>
         
+        {/* Usage Dashboard */}
+        <div className="mb-12">
+          <UsageDashboard />
+        </div>
+        
+        {/* Analytics Dashboard */}
         <AnalyticsDashboard />
       </div>
     </main>

@@ -2,11 +2,24 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Menu, X, Shield, Zap, Users } from 'lucide-react'
+import { Menu, X, Shield, Zap, Users, User, LogOut } from 'lucide-react'
 import { cn } from '../lib/utils'
+import { SessionManager } from '../lib/auth'
+import { AuthModal } from './AuthModal'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [user, setUser] = useState(SessionManager.getCurrentUser())
+
+  const handleAuthSuccess = () => {
+    setUser(SessionManager.getCurrentUser())
+  }
+
+  const handleLogout = () => {
+    SessionManager.clearSession()
+    setUser(null)
+  }
 
   return (
     <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-primary-200 sticky top-0 z-50">
@@ -60,23 +73,50 @@ export function Header() {
                 </motion.a>
               </nav>
 
-          {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <motion.button
-              className="px-6 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Sign In
-            </motion.button>
-            <motion.button
-              className="px-6 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Start Free Trial
-            </motion.button>
-          </div>
+              {/* Desktop CTA Buttons */}
+              <div className="hidden md:flex items-center space-x-4">
+                {user ? (
+                  <>
+                    <div className="flex items-center space-x-3">
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-primary-900">{user.name}</p>
+                        <p className="text-xs text-primary-600 capitalize">{user.plan} Plan</p>
+                      </div>
+                      <div className="w-8 h-8 bg-gradient-to-r from-primary-600 to-primary-700 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    <motion.button
+                      onClick={handleLogout}
+                      className="px-4 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200 flex items-center space-x-2"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </motion.button>
+                  </>
+                ) : (
+                  <>
+                    <motion.button
+                      onClick={() => setShowAuthModal(true)}
+                      className="px-6 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Sign In
+                    </motion.button>
+                    <motion.button
+                      onClick={() => setShowAuthModal(true)}
+                      className="px-6 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Start Free Trial
+                    </motion.button>
+                  </>
+                )}
+              </div>
 
           {/* Mobile Menu Button */}
           <motion.button
@@ -119,23 +159,62 @@ export function Header() {
                 >
                   Dashboard
                 </a>
-            <div className="px-4 pt-4 space-y-3">
-              <button
-                className="w-full px-4 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Sign In
-              </button>
-              <button
-                className="w-full px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Start Free Trial
-              </button>
-            </div>
+                <div className="px-4 pt-4 space-y-3">
+                  {user ? (
+                    <>
+                      <div className="flex items-center space-x-3 p-3 bg-primary-50 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-r from-primary-600 to-primary-700 rounded-full flex items-center justify-center">
+                          <User className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-primary-900">{user.name}</p>
+                          <p className="text-xs text-primary-600 capitalize">{user.plan} Plan</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleLogout()
+                          setIsMenuOpen(false)
+                        }}
+                        className="w-full px-4 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200 flex items-center justify-center space-x-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setShowAuthModal(true)
+                          setIsMenuOpen(false)
+                        }}
+                        className="w-full px-4 py-2 text-primary-700 font-medium hover:text-primary-600 transition-colors duration-200"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAuthModal(true)
+                          setIsMenuOpen(false)
+                        }}
+                        className="w-full px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200"
+                      >
+                        Start Free Trial
+                      </button>
+                    </>
+                  )}
+                </div>
           </div>
         </motion.div>
       </div>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+      />
     </header>
   )
 }
